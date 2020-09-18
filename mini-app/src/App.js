@@ -17,7 +17,7 @@ const App = () => {
 	//const [popout, setPopout] = useState(<ScreenSpinner size='large' />);
 	const [popout, setPopout] = useState(null);
 
-
+	const [audio, setAudio] = useState(null);
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data }}) => {
@@ -43,8 +43,8 @@ const App = () => {
 		<View activePanel={activePanel} popout={popout}>
 
 			<CreatePodcastMain id='createpodcastmain' go={go} />
-			<CreatePodcastForm id='createpodcastform' go={go} />
-			<Editor id='editor' fetchedUser={fetchedUser} go={go} />
+			<CreatePodcastForm id='createpodcastform' go={go} setAudio={setAudio} />
+			<Editor id='editor' fetchedUser={fetchedUser} go={go} audio={audio} />
 			<Home id='home' fetchedUser={fetchedUser} go={go} />
 			<Persik id='persik' go={go} />
 		</View>

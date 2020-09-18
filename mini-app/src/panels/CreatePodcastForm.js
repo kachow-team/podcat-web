@@ -68,7 +68,7 @@ class CreatePodcastForm extends React.Component {
             });
             //console.log(this.state.audiofile);
             //console.log(this.state.audioPreviewUrl);
-            //this.props.setDonation({imagePreviewUrl: reader.result})
+            this.props.setAudio(reader.result)
         };
 
         reader.readAsDataURL(file)

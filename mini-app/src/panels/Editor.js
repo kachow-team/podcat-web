@@ -80,7 +80,8 @@ class Editor extends React.Component {
 
             let alias = this.setState.bind(this);
 
-            wavesurfer.load('sample2.mp3');
+            wavesurfer.load(this.props.audio);
+            //wavesurfer.load('sample2.mp3');
             wavesurfer.on('audioprocess', function (e) {
                 // console.log(e);
             });
