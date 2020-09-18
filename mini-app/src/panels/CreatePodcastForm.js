@@ -106,12 +106,12 @@ class CreatePodcastForm extends React.Component {
                         <div style={{width: '80%', display: 'flex', flexDirection: 'column'}}>
                             <div className="FormLayout__row-top" style={{alignSelf: 'flex-start'}}>Название</div>
                             <Input top="Название" placeholder={"Введите название подкаста"}
-                                   value={this.props.podcastName}
-                                   onChange={e => this.props.setpodcastName(e.currentTarget.value)}/>
+
+                                  />
                         </div>
                     </div>
-                    <Textarea top="Описание" value={this.props.donationDescription}
-                              onChange={e => this.props.setdonationDescription(e.currentTarget.value)}/>
+                    <Textarea top="Описание"
+                         />
 
 
                     {!!this.state.audioPreviewUrl ? (
@@ -149,15 +149,13 @@ class CreatePodcastForm extends React.Component {
                     <Checkbox>Трейлер подкаста</Checkbox>
 
                     <Select placeholder="Кому доступен этот подкаст" value={this.props.donationAuthor}
-                            onChange={e => this.props.setdonationAuthor(e.currentTarget.value)}>
-                        <option
-                            value="user">{!!this.props.user ? `${this.props.user.first_name} ${this.props.user.last_name}` : 'Андрей Иванов'}</option>
+                          >
                         <option value="fr">Друзьям</option>
                         <option value="my">Только мне</option>
                     </Select>
 
 
-                    <Button size="xl" onClick={this.props.go} data-to="targetdonation">Далее</Button>
+                    <Button size="xl" onClick={this.props.go} data-to="final">Далее</Button>
 
                 </FormLayout>
             </Panel>

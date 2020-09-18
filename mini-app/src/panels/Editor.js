@@ -12,6 +12,10 @@ import CellButton from "@vkontakte/vkui/dist/components/CellButton/CellButton";
 import Header from "@vkontakte/vkui/dist/components/Header/Header";
 import FormLayoutGroup from "@vkontakte/vkui/dist/components/FormLayoutGroup/FormLayoutGroup";
 import Input from "@vkontakte/vkui/dist/components/Input/Input";
+import PanelHeaderButton from "@vkontakte/vkui/dist/components/PanelHeaderButton/PanelHeaderButton";
+import {IOS, platform} from "@vkontakte/vkui";
+import Icon28ChevronBack from "@vkontakte/icons/dist/28/chevron_back";
+import Icon24Back from "@vkontakte/icons/dist/24/back";
 
 function createBuffer(originalBuffer, duration) {
     let sampleRate = originalBuffer.sampleRate
@@ -36,12 +40,15 @@ function copyBuffer(fromBuffer, fromStart, fromEnd, toBuffer, toStart) {
     }
 }
 
+const osName = platform();
+
 class Editor extends React.Component {
     state = {
         wavesurfer: {},
         start: 0.0,
         end: 0.0,
-        timecodes: [1]
+        timecodes: [],
+        playing: false
     };
 
     constructor(props) {
@@ -86,8 +93,8 @@ class Editor extends React.Component {
 
             let alias = this.setState.bind(this);
 
-            //wavesurfer.load(this.props.audio);
-            wavesurfer.load('sample2.mp3');
+            wavesurfer.load(this.props.audio);
+            //wavesurfer.load('sample2.mp3');
             wavesurfer.on('audioprocess', function (e) {
                 // console.log(e);
             });
@@ -133,32 +140,53 @@ class Editor extends React.Component {
 
         return (
             <Panel id="editor">
-                <PanelHeader>Редактор</PanelHeader>
-                <Div>
+                <PanelHeader
+                    left={<PanelHeaderButton onClick={this.props.go} data-to="createpodcastform">
+                        {osName === IOS ? <Icon28ChevronBack/> : <Icon24Back/>}
+                    </PanelHeaderButton>}
+                >
+                    Редактор
+                </PanelHeader>
+                <Div onClick={()=>{
+                    this.state.wavesurfer.addRegion({
+                        start: 0,
+                        end: this.state.wavesurfer.getDuration(),
+                        loop: false,
+                        color: 'hsla(400, 100%, 30%, 0.5)'
+                    })
+                }}>
                     <div className={'timelime'} ref={this.wavetimeRef}/>
                     <div className={'editor-main'} ref={this.waveformRef}/>
                 </Div>
                 <Div>
-                    <Button onClick={() => this.state.wavesurfer.play()}> Play</Button>
-                    <Button onClick={() => {
-
-                        this.state.wavesurfer.pause();
-                    }
-                    }> Stop</Button>
-                    <Button onClick={() => {
-                        this.state.wavesurfer.addRegion({
-                            start: 0,
-                            end: this.state.wavesurfer.getDuration(),
-                            loop: false,
-                            color: 'hsla(400, 100%, 30%, 0.5)'
-                        })
-                    }
-                    }>Add reg</Button>
-                    <Button onMouseUp={() => removePart()} onTouchStart={() => removePart()}>Scissors</Button>
+                    <svg style={this.state.playing ? {} : {opacity: 0.4}} onClick={() => {
+                        if (this.state.playing) {
+                            this.state.wavesurfer.pause();
+                            this.setState({playing: !this.state.playing})
+                        } else
+                        {
+                            this.state.wavesurfer.play()
+                            this.setState({playing: !this.state.playing})
+                        }
+                    }} width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="44" height="44" rx="10" fill="#3F8AE0"/>
+                        <path
+                            d="M29.65 19.9215C30.8314 20.6036 31.4221 20.9446 31.6203 21.3898C31.7932 21.7782 31.7932 22.2217 31.6203 22.61C31.4221 23.0553 30.8314 23.3963 29.65 24.0784L19.6 29.8808C18.4186 30.5628 17.8279 30.9039 17.3432 30.8529C16.9204 30.8085 16.5364 30.5868 16.2865 30.2428C16 29.8485 16 29.1665 16 27.8023L16 16.1976C16 14.8334 16 14.1513 16.2865 13.757C16.5364 13.4131 16.9204 13.1914 17.3432 13.1469C17.8279 13.096 18.4186 13.437 19.6 14.1191L29.65 19.9215Z"
+                            fill="white"/>
+                    </svg>
+                    <svg style={{marginLeft:'10px'}} onMouseUp={() => removePart()} onTouchStart={() => removePart()} width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="44" height="44" rx="10" fill="#F2F3F5"/>
+                        <path d="M16 19C17.6569 19 19 17.6569 19 16C19 14.3431 17.6569 13 16 13C14.3431 13 13 14.3431 13 16C13 17.6569 14.3431 19 16 19Z" stroke="#3F8AE0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 31C17.6569 31 19 29.6569 19 28C19 26.3431 17.6569 25 16 25C14.3431 25 13 26.3431 13 28C13 29.6569 14.3431 31 16 31Z" stroke="#3F8AE0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M30 14L18.12 25.88" stroke="#3F8AE0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M24.47 24.48L30 30" stroke="#3F8AE0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M18.12 18.12L22 22" stroke="#3F8AE0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </Div>
                 <Group header={<Header mode="secondary">Таймкоды</Header>}>
                     <div>
-                        <CellButton onClick={() => this.setState({timecodes: this.state.timecodes.concat(Math.random() * 1000000000000000000)})}
+                        <CellButton
+                            onClick={() => this.setState({timecodes: this.state.timecodes.concat(Math.random() * 1000000000000000000)})}
                             before={<svg style={{marginRight: '12px'}} width="24" height="24" viewBox="0 0 24 24"
                                          fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
@@ -174,9 +202,9 @@ class Editor extends React.Component {
                                 alignItems: 'center'
                             }}>
                                 <svg
-                                    onClick={()=>this.setState({timecodes: this.state.timecodes.filter((item) => item !== timecode)})}
+                                    onClick={() => this.setState({timecodes: this.state.timecodes.filter((item) => item !== timecode)})}
                                     width="22" height="22" viewBox="0 0 22 22" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
+                                    xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M11 0C17.0751 0 22 4.92487 22 11C22 17.0751 17.0751 22 11 22C4.92487 22 0 17.0751 0 11C0 4.92487 4.92487 0 11 0ZM16 10H6C5.44772 10 5 10.4477 5 11C5 11.5523 5.44772 12 6 12H16C16.5523 12 17 11.5523 17 11C17 10.4477 16.5523 10 16 10Z"
                                         fill="#E64646"/>
