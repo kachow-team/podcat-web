@@ -9,18 +9,22 @@ import './Editor.css'
 import TimelinePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.timeline';
 
 function createBuffer(originalBuffer, duration) {
-    var sampleRate = originalBuffer.sampleRate
-    var frameCount = duration * sampleRate
-    var channels = originalBuffer.numberOfChannels
+    let sampleRate = originalBuffer.sampleRate
+    let frameCount = duration * sampleRate
+    let channels = originalBuffer.numberOfChannels
+
+    let AudioContext = window.AudioContext          // Default
+        || window.webkitAudioContext;  // Safari and old versions of Chrome
+
     return new AudioContext().createBuffer(channels, frameCount, sampleRate)
 }
 
 function copyBuffer(fromBuffer, fromStart, fromEnd, toBuffer, toStart) {
     var sampleRate = fromBuffer.sampleRate
     var frameCount = (fromEnd - fromStart) * sampleRate
-    for (var i = 0; i < fromBuffer.numberOfChannels; i++) {
-        var fromChanData = fromBuffer.getChannelData(i)
-        var toChanData = toBuffer.getChannelData(i)
+    for (let i = 0; i < fromBuffer.numberOfChannels; i++) {
+        let fromChanData = fromBuffer.getChannelData(i)
+        let toChanData = toBuffer.getChannelData(i)
         for (var j = 0, f = Math.round(fromStart * sampleRate), t = Math.round(toStart * sampleRate); j < frameCount; j++, f++, t++) {
             toChanData[t] = fromChanData[f]
         }
@@ -125,6 +129,7 @@ class Editor extends React.Component {
                     }>Add reg</Button>
                     <Button onClick={() => {
                         console.log(this.state.wavesurfer.regions.list);
+                        console.log('click at scissors');
                         let start = this.state.start;
                         let end = this.state.end;
                         let duration = this.state.wavesurfer.getDuration() - end + start;
@@ -140,6 +145,7 @@ class Editor extends React.Component {
                             this.state.wavesurfer.clearRegions();
                         } else {
                             this.state.wavesurfer.empty();
+                            console.log('emptyy')
                         }
                     }
                     }>Scissors</Button>

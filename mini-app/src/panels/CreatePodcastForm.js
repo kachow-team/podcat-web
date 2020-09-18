@@ -93,29 +93,35 @@ class CreatePodcastForm extends React.Component {
                     <input id='selectAudio' hidden type="file" ref={this.fileRefAudio} style={{padding: 0}}
                            onChange={(e) => this.onChangeAudio(e)}/>
 
-                    <Div style={{display: 'flex'}}>
+                    <div style={{display: 'flex', marginLeft: '12px'}}>
                         <div onClick={() => this.triggerClick()} style={{
-                            backgroundImage: `url(${uploadPlaceHolder})`,
+                            backgroundImage: `url(${!!this.state.imagePreviewUrl ? this.state.imagePreviewUrl : uploadPlaceHolder})`,
                             width: '72px',
                             height: '72px',
                             borderRadius: "10px",
                             backgroundSize: "cover",
                             backgroundPosition: "center top"
                         }}/>
-                        <div style={{width: '80%'}}>
+
+                        <div style={{width: '80%', display: 'flex', flexDirection: 'column'}}>
+                            <div className="FormLayout__row-top" style={{alignSelf: 'flex-start'}}>Название</div>
                             <Input top="Название" placeholder={"Введите название подкаста"}
                                    value={this.props.podcastName}
                                    onChange={e => this.props.setpodcastName(e.currentTarget.value)}/>
                         </div>
-                    </Div>
+                    </div>
                     <Textarea top="Описание" value={this.props.donationDescription}
                               onChange={e => this.props.setdonationDescription(e.currentTarget.value)}/>
 
 
                     {!!this.state.audioPreviewUrl ? (
-                        <div>
-                            <div>
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
+                        <Div>
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'flex-start',
+                                alignItems: 'center'
+                            }}>
+                                <svg style={{marginRight:'12px'}} width="48" height="48" viewBox="0 0 48 48" fill="none"
                                      xmlns="http://www.w3.org/2000/svg">
                                     <rect width="48" height="48" rx="10" fill="#F2F3F5"/>
                                     <path
@@ -124,13 +130,18 @@ class CreatePodcastForm extends React.Component {
                                 </svg>
                                 {this.state.audiofile.name}
                             </div>
-                            <p>Вы можете добавить таймкоды и скорректировать подкаст в режиме редактирования</p>
-                            <Button mode="outline" onClick={this.props.go} data-to="editor"> Редактировать аудиозапись</Button>
-                        </div>
+                            <p className={"TextGray"}>Вы можете добавить таймкоды и скорректировать подкаст в режиме
+                                редактирования</p>
+                            <Button size={'xl'} mode="outline" onClick={this.props.go} data-to="editor"> Редактировать
+                                аудиозапись</Button>
+                        </Div>
                     ) : (
-                        <p className={'header-main'}> Загрузите Ваш подкаст</p>,
-                            <p className={"TextGray"}> Выберите готовый аудиофайл из вашего телефона и добавьте его</p>,
-                            <Button mode="outline" onClick={() => this.triggerClickAudio()}>Загрузить файл</Button>
+                        <Div>
+                            <p className={'header-main'}> Загрузите Ваш подкаст</p>
+                            <p className={"TextGray"}> Выберите готовый аудиофайл из вашего телефона и добавьте его</p>
+                            <Button mode="outline" style={{width: '148px', height: '36px'}}
+                                    onClick={() => this.triggerClickAudio()}>Загрузить файл</Button>
+                        </Div>
                     )
                     }
                     <Checkbox>Ненормативный контент</Checkbox>
