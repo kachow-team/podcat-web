@@ -7,6 +7,9 @@ import Regions from 'wavesurfer.js/dist/plugin/wavesurfer.regions';
 import Div from "@vkontakte/vkui/dist/components/Div/Div";
 import './Editor.css'
 import TimelinePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.timeline';
+import Group from "@vkontakte/vkui/dist/components/Group/Group";
+import CellButton from "@vkontakte/vkui/dist/components/CellButton/CellButton";
+import Header from "@vkontakte/vkui/dist/components/Header/Header";
 
 function createBuffer(originalBuffer, duration) {
     let sampleRate = originalBuffer.sampleRate
@@ -103,7 +106,27 @@ class Editor extends React.Component {
     }
 
     render() {
+        const removePart = () => {
+            console.log(this.state.wavesurfer.regions.list);
+            console.log('click at scissors');
+            let start = this.state.start;
+            let end = this.state.end;
+            let duration = this.state.wavesurfer.getDuration() - end + start;
 
+            if (duration > 0) {
+                let buffer = createBuffer(this.state.wavesurfer.backend.buffer, duration);
+
+                copyBuffer(this.state.wavesurfer.backend.buffer, 0, start, buffer, 0);
+                copyBuffer(this.state.wavesurfer.backend.buffer, end, duration + end, buffer, start);
+                console.log(`from ${start} to ${end} deleted duration${duration}`);
+                this.state.wavesurfer.empty();
+                this.state.wavesurfer.loadDecodedBuffer(buffer);
+                this.state.wavesurfer.clearRegions();
+            } else {
+                this.state.wavesurfer.empty();
+                console.log('emptyy')
+            }
+        };
 
         return (
             <Panel id="editor">
@@ -128,29 +151,11 @@ class Editor extends React.Component {
                         })
                     }
                     }>Add reg</Button>
-                    <Button onClick={() => {
-                        console.log(this.state.wavesurfer.regions.list);
-                        console.log('click at scissors');
-                        let start = this.state.start;
-                        let end = this.state.end;
-                        let duration = this.state.wavesurfer.getDuration() - end + start;
-
-                        if (duration > 0) {
-                            let buffer = createBuffer(this.state.wavesurfer.backend.buffer, duration);
-
-                            copyBuffer(this.state.wavesurfer.backend.buffer, 0, start, buffer, 0);
-                            copyBuffer(this.state.wavesurfer.backend.buffer, end, duration + end, buffer, start);
-                            console.log(`from ${start} to ${end} deleted duration${duration}`);
-                            this.state.wavesurfer.empty();
-                            this.state.wavesurfer.loadDecodedBuffer(buffer);
-                            this.state.wavesurfer.clearRegions();
-                        } else {
-                            this.state.wavesurfer.empty();
-                            console.log('emptyy')
-                        }
-                    }
-                    }>Scissors</Button>
+                    <Button onMouseUp={() => removePart()} onTouchStart={() => removePart()}>Scissors</Button>
                 </Div>
+                <Group header={<Header mode="secondary">Таймкоды</Header>}>
+                    <CellButton>Добавить таймкод</CellButton>
+                </Group>
             </Panel>
         );
 
