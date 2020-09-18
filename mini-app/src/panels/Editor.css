@@ -73,3 +73,6 @@ canvas {
     bottom: -38px;
 }
 
+.meow .FormField {
+    width: 40%;
+}

@@ -11,7 +11,7 @@ import Editor from "./panels/Editor";
 import CreatePodcastForm from "./panels/CreatePodcastForm";
 
 const App = () => {
-	const [activePanel, setActivePanel] = useState('createpodcastmain');
+	const [activePanel, setActivePanel] = useState('editor');
 	const [fetchedUser, setUser] = useState(null);
 
 	//const [popout, setPopout] = useState(<ScreenSpinner size='large' />);
