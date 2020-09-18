@@ -14,7 +14,7 @@
 
     /* Inside Auto Layout */
     flex: none;
-    margin: 0px 8px;
+    margin-top: 0px;
 }
 
 .kek{
@@ -34,4 +34,19 @@
 .Div--android{
     padding-top: 0 !important;
     text-align: center;
+}
+
+.header-main{
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 24px;
+    /* identical to box height, or 120% */
+    text-align: center;
+    letter-spacing: 0.38px;
+
+    /* Light Text / Primary */
+    color: #000000;
+    margin-bottom: 0px;
+    margin-top: 8px;
 }

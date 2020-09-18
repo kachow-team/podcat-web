@@ -6,11 +6,12 @@ import '@vkontakte/vkui/dist/vkui.css';
 
 import Home from './panels/Home';
 import Persik from './panels/Persik';
-import CreateHelpHome from "./panels/CreateHelpHome";
+import CreatePodcastMain from "./panels/CreatePodcastMain";
 import Editor from "./panels/Editor";
+import CreatePodcastForm from "./panels/CreatePodcastForm";
 
 const App = () => {
-	const [activePanel, setActivePanel] = useState('editor');
+	const [activePanel, setActivePanel] = useState('createpodcastmain');
 	const [fetchedUser, setUser] = useState(null);
 
 	//const [popout, setPopout] = useState(<ScreenSpinner size='large' />);
@@ -40,8 +41,10 @@ const App = () => {
 
 	return (
 		<View activePanel={activePanel} popout={popout}>
+
+			<CreatePodcastMain id='createpodcastmain' go={go} />
+			<CreatePodcastForm id='createpodcastform' go={go} />
 			<Editor id='editor' fetchedUser={fetchedUser} go={go} />
-			<CreateHelpHome id='createhelphome' go={go} />
 			<Home id='home' fetchedUser={fetchedUser} go={go} />
 			<Persik id='persik' go={go} />
 		</View>
