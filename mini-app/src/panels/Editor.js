@@ -79,9 +79,6 @@ class Editor extends React.Component {
                 plugins: [
                     Regions.create({
                         regions: [],
-                        dragSelection: {
-                            slop: 5
-                        }
                     }),
                     // TimelinePlugin.create({
                     //     container: this.waveformRef.current
