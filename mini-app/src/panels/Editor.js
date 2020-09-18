@@ -3,71 +3,151 @@ import Panel from '@vkontakte/vkui/dist/components/Panel/Panel';
 import Button from "@vkontakte/vkui/dist/components/Button/Button";
 import PanelHeader from "@vkontakte/vkui/dist/components/PanelHeader/PanelHeader";
 import WaveSurfer from 'wavesurfer.js';
+import Regions from 'wavesurfer.js/dist/plugin/wavesurfer.regions';
+import Div from "@vkontakte/vkui/dist/components/Div/Div";
+import './Editor.css'
+import TimelinePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.timeline';
+
+function createBuffer(originalBuffer, duration) {
+    var sampleRate = originalBuffer.sampleRate
+    var frameCount = duration * sampleRate
+    var channels = originalBuffer.numberOfChannels
+    return new AudioContext().createBuffer(channels, frameCount, sampleRate)
+}
+
+function copyBuffer(fromBuffer, fromStart, fromEnd, toBuffer, toStart) {
+    var sampleRate = fromBuffer.sampleRate
+    var frameCount = (fromEnd - fromStart) * sampleRate
+    for (var i = 0; i < fromBuffer.numberOfChannels; i++) {
+        var fromChanData = fromBuffer.getChannelData(i)
+        var toChanData = toBuffer.getChannelData(i)
+        for (var j = 0, f = Math.round(fromStart * sampleRate), t = Math.round(toStart * sampleRate); j < frameCount; j++, f++, t++) {
+            toChanData[t] = fromChanData[f]
+        }
+    }
+}
 
 class Editor extends React.Component {
+    state = {
+        wavesurfer: {},
+        start: 0.0,
+        end: 0.0
+    };
+
+    constructor(props) {
+        super(props);
+        this.waveformRef = React.createRef();
+        this.wavetimeRef = React.createRef();
+    }
+
+    componentDidMount() {
+        if (this.waveformRef.current) {
+            const wavesurfer = WaveSurfer.create({
+                autoCenter: false,
+                container: this.waveformRef.current,
+                barRadius: 3,
+                barWidth: 2,
+                barGap: 5,
+                cursorWidth: 1,
+                backend: 'WebAudio',
+                height: 40,
+                progressColor: '#3F8AE0',
+                responsive: true,
+                //waveColor: '#EFEFEF',
+                waveColor: '#3F8AE0',
+                backgroundColor: '#F2F3F5',
+                cursorColor: '#FF3347',
+                scrollParent: false,
+                normalize: true,
+                plugins: [
+                    Regions.create({
+                        regions: [],
+                        dragSelection: {
+                            slop: 5
+                        }
+                    }),
+                    // TimelinePlugin.create({
+                    //     container: this.waveformRef.current
+                    // })
+                ]
+
+            });
+            this.setState({wavesurfer});
+
+            let alias = this.setState.bind(this);
+
+            wavesurfer.load('sample2.mp3');
+            wavesurfer.on('audioprocess', function (e) {
+                // console.log(e);
+            });
+            wavesurfer.on('region-created', function (e) {
+                alias({
+                    start: e.start,
+                    end: e.end
+                })
+                console.log(`UPDATED START ${e.start}`)
+            });
+            wavesurfer.on('region-updated', function (e) {
+                alias({
+                    start: e.start,
+                    end: e.end
+                })
+                console.log(`UPDATED END ${e.end}`)
+            });
+        }
+    }
 
     render() {
-        var context;
 
-                window.AudioContext = window.AudioContext||window.webkitAudioContext;
-                context = new AudioContext();
-
-// переменные для буфера, источника и получателя
-        var buffer, source, destination;
-
-// функция для подгрузки файла в буфер
-        var loadSoundFile = function(url) {
-            // делаем XMLHttpRequest (AJAX) на сервер
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', url, true);
-            xhr.responseType = 'arraybuffer'; // важно
-            xhr.onload = function(e) {
-                // декодируем бинарный ответ
-                context.decodeAudioData(this.response,
-                    function(decodedArrayBuffer) {
-                        // получаем декодированный буфер
-                        buffer = decodedArrayBuffer;
-                    }, function(e) {
-                        console.log('Error decoding file', e);
-                    });
-            };
-            xhr.send();
-        };
-
-// функция начала воспроизведения
-        var play = function(){
-            // создаем источник
-            source = context.createBufferSource();
-            // подключаем буфер к источнику
-            source.buffer = buffer;
-            // дефолтный получатель звука
-            destination = context.destination;
-            // подключаем источник к получателю
-            //source.connect(destination);
-            // воспроизводим
-            //   source.start(0);
-
-            var gainNode = context.createGain();
-            gainNode.gain.value = -0.8;
-            source.connect(gainNode);
-            gainNode.connect(destination);
-            source.start(0);
-        };
-
-// функция остановки воспроизведения
-        var stop = function(){
-            source.stop(0);
-        };
-
-        loadSoundFile('sample.mp3');
 
         return (
             <Panel id="editor">
                 <PanelHeader>Редактор</PanelHeader>
-                <Button onClick={()=>play()}> Play</Button>
-                <Button onClick={()=>stop()}> Stop</Button>
+                <Div>
+                    <div className={'timelime'} ref={this.wavetimeRef}/>
+                    <div className={'editor-main'} ref={this.waveformRef}/>
+                </Div>
+                <Div>
+                    <Button onClick={() => this.state.wavesurfer.play()}> Play</Button>
+                    <Button onClick={() => {
+
+                        this.state.wavesurfer.pause();
+                    }
+                    }> Stop</Button>
+                    <Button onClick={() => {
+                        this.state.wavesurfer.addRegion({
+                            start: 0,
+                            end: this.state.wavesurfer.getDuration(),
+                            loop: false,
+                            color: 'hsla(400, 100%, 30%, 0.5)'
+                        })
+                    }
+                    }>Add reg</Button>
+                    <Button onClick={() => {
+                        console.log(this.state.wavesurfer.regions.list);
+                        let start = this.state.start;
+                        let end = this.state.end;
+                        let duration = this.state.wavesurfer.getDuration() - end + start;
+
+                        if (duration > 0) {
+                            let buffer = createBuffer(this.state.wavesurfer.backend.buffer, duration);
+
+                            copyBuffer(this.state.wavesurfer.backend.buffer, 0, start, buffer, 0);
+                            copyBuffer(this.state.wavesurfer.backend.buffer, end, duration + end, buffer, start);
+                            console.log(`from ${start} to ${end} deleted duration${duration}`);
+                            this.state.wavesurfer.empty();
+                            this.state.wavesurfer.loadDecodedBuffer(buffer);
+                            this.state.wavesurfer.clearRegions();
+                        } else {
+                            this.state.wavesurfer.empty();
+                        }
+                    }
+                    }>Scissors</Button>
+                </Div>
             </Panel>
         );
+
+
     }
 }
 

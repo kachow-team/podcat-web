@@ -1,0 +1,74 @@
+.wavesurfer-region {
+    border-bottom: 2px solid;
+    border-top: 2px solid;
+    border-left: 6px solid;
+    border-right: 6px solid;
+
+    top: -2px !important;
+    border-color: #3F8AE0;
+    background-color: transparent !important;
+}
+
+.wavesurfer-region:before {
+    background-color: rgba(0,0,0,.4);
+}
+.wavesurfer-region:after {
+    background-color: rgba(0,0,0,.4);
+}
+
+.editor-main {
+    padding-bottom: 24px;
+    padding-top: 24px;
+    position: relative;
+}
+
+canvas {
+    top: 50% !important;
+    left: 50% !important;
+    height: initial !important;
+    transform: translate(-50%, -50%);
+}
+
+#editor > div > div:nth-child(4) > div > wave {
+    position: initial !important;
+}
+
+.wavesurfer-handle-start {
+    left: -3px !important;
+    top: 50% !important;
+    height: 12px !important;
+    background-color: #FFFFFF !important;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    width: 2px !important;
+}
+
+.wavesurfer-handle-start:before {
+    content: '';
+    position: absolute;
+    display: block;
+    top: -38px;
+    left: -3px;
+    right: -3px;
+    bottom: -38px;
+}
+
+.wavesurfer-handle-end {
+    right: -5px !important;
+    top: 50% !important;
+    height: 12px !important;
+    background-color: #FFFFFF !important;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    width: 2px !important;
+}
+
+.wavesurfer-handle-end:before {
+    content: '';
+    position: absolute;
+    display: block;
+    top: -38px;
+    left: -3px;
+    right: -3px;
+    bottom: -38px;
+}
